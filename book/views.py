@@ -47,7 +47,7 @@ def updateBook(request, id):
     book = get_object_or_404(Book, id=id)
     form = BookForm(request.POST or None, request.FILES or None, instance=book)
     if form.is_valid():
-        book = form.save(commit=False)
+        book = form.save(commit=True)
 
         book.author = request.user
         book.save()
