@@ -36,7 +36,7 @@ def add_book(request):
     form = BookForm(request.POST or None, request.FILES or None)
 
     if form.is_valid():
-        book = form.save(commit=False)
+        book = form.save(commit=True)
         messages.success(request, "Kitap Başarıyla Oluşturuldu")
 
     return render(request, "add_book.html", {"form": form})
