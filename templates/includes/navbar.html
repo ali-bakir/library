@@ -1,0 +1,41 @@
+<nav class="navbar navbar-toggleable-md navbar-light" style="background-color: #ffcc99;">
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+            data-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false"
+            aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand" href="{% url 'index' %}">Kütüphane</a>
+
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+        <ul class="navbar-nav mr-auto mt-2 mt-md-0">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'about' %}">Hakkımızda <span class="sr-only"></span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'book:books' %}">Kitaplar</a>
+            </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            {% if request.user.is_authenticated %}
+                <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'book:dashboard' %}">Kontrol Paneli</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'user:logout' %}">Çıkış Yap</a>
+                </li>
+            {% else %}
+                <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'user:login' %}">Giriş Yap</a>
+                </li>
+            {% endif %}
+
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'user:register' %}">Kayıt Ol</a>
+            </li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="text" placeholder="Aramalısın">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Arar mısın?</button>
+        </form>
+    </div>
+</nav>
