@@ -21,7 +21,7 @@ class Publisher(models.Model):
 class Book(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE, verbose_name="Yazar")
     title = models.CharField(max_length=50, verbose_name="Başlık")
-    content = models.TextField(verbose_name="İçerik")
+    content = RichTextField(verbose_name="İçerik")
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Oluşturulma Tarihi")
     publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE, default=None)
     book_image = models.FileField(blank=True, null=True, verbose_name="Kitaba Fotoğraf Ekleyebilirsiniz.")
