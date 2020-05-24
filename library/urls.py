@@ -29,8 +29,6 @@ urlpatterns = [
     path('about/', views.about, name="about"),
     path('book/', include("book.urls")),
     path('user/', include("user.urls")),
-    #path('books/', views.books, name="books")
-    path('comment/', views.comment, name="comment"),
 
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
