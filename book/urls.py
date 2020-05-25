@@ -12,5 +12,7 @@ urlpatterns = [
     path('delete/<int:id>', views.deleteBook, name="delete"),
     path('', views.books, name="books"),
     path('comment/<int:id>', views.comment, name="comment"),
+    path('favourite/', views.favourite, name="favourite"),
+    path('wish/', views.wish, name="wish"),
 
 ]
