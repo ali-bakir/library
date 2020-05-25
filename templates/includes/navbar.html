@@ -21,6 +21,12 @@
                     <a class="nav-link" href="{% url 'book:dashboard' %}">Kontrol Paneli</a>
                 </li>
                 <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'book:favourite' %}">Favori Listesi</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'book:wish' %}">İstek Listesi</a>
+                </li>
+                <li class="nav-item active">
                     <a class="nav-link" href="{% url 'user:logout' %}">Çıkış Yap</a>
                 </li>
             {% else %}

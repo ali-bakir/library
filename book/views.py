@@ -30,6 +30,17 @@ def dashboard(request):
     context = {"books": books}
     return render(request, "dashboard.html", context=context)
 
+@login_required(login_url="user:login")
+def favourite(request):
+    books = Book.objects.all()
+    context = {"books": books}
+    return render(request, "favourite.html", context=context)
+
+@login_required(login_url="user:login")
+def wish(request):
+    books = Book.objects.all()
+    context = {"books": books}
+    return render(request, "wish.html", context=context)
 
 @login_required(login_url="user:login")
 def add_book(request):
@@ -88,3 +99,5 @@ def comment(request, id):
 
         newComment.save()
     return redirect(reverse("book:detail", kwargs={"id": id}))
+
+
