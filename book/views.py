@@ -35,6 +35,16 @@ def favourite(request):
     books = Book.objects.all()
     context = {"books": books}
     return render(request, "favourite.html", context=context)
+@login_required(login_url="user:login")
+def add_favourite(request, id):
+    form = BookForm(request.POST or None, request.FILES or None)
+
+    if form.is_valid():
+        book = form.save(commit=True)
+        messages.success(request, "Favorine Eklendi")
+
+    return render(request, "add_favourite.html", {"form": form})
+
 
 @login_required(login_url="user:login")
 def wish(request):
@@ -42,6 +52,15 @@ def wish(request):
     context = {"books": books}
     return render(request, "wish.html", context=context)
 
+@login_required(login_url="user:login")
+def add_wish(request, id):
+    form = BookForm(request.POST or None, request.FILES or None)
+
+    if form.is_valid():
+        book = form.save(commit=True)
+        messages.success(request, "İstek Kitaplığına Eklendi")
+
+    return render(request, "add_wish.html", {"form": form})
 @login_required(login_url="user:login")
 def add_book(request):
     form = BookForm(request.POST or None, request.FILES or None)
@@ -99,5 +118,6 @@ def comment(request, id):
 
         newComment.save()
     return redirect(reverse("book:detail", kwargs={"id": id}))
+
 
 
