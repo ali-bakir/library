@@ -13,6 +13,8 @@ urlpatterns = [
     path('', views.books, name="books"),
     path('comment/<int:id>', views.comment, name="comment"),
     path('add_favourite/<int:id>', views.add_favourite, name="add_favourite"),
+    path('delete_favourite/<int:id>', views.delete_favourite,
+         name="delete_favourite"),
     path('add_wish/<int:id>', views.add_wish, name="add_wish"),
     path('favourite/', views.favourite, name="favourite"),
     path('wish/', views.wish, name="wish"),
