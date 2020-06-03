@@ -1,6 +1,7 @@
-from django.shortcuts import render, HttpResponse, redirect, get_object_or_404, reverse
-from .forms import BookForm
-from .models import Book, Comment
+from django.shortcuts import render, HttpResponse, redirect, get_object_or_404, \
+    reverse
+from .forms import BookForm, FavouriteBookForm
+from .models import Book, Comment, FavouriteBook
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
@@ -30,20 +31,33 @@ def dashboard(request):
     context = {"books": books}
     return render(request, "dashboard.html", context=context)
 
+
 @login_required(login_url="user:login")
 def favourite(request):
-    books = Book.objects.all()
-    context = {"books": books}
+    favourite_books = FavouriteBook.objects.select_related(
+        'book',
+        'book__author',
+        'user').filter(
+        user=request.user)
+    print(favourite_books.query)
+    context = {"favourite_books": favourite_books}
     return render(request, "favourite.html", context=context)
+
+
 @login_required(login_url="user:login")
 def add_favourite(request, id):
-    form = BookForm(request.POST or None, request.FILES or None)
-
+    form = FavouriteBookForm({'user': request.user.id, 'book': id})
     if form.is_valid():
-        book = form.save(commit=True)
-        messages.success(request, "Favorine Eklendi")
+        form.save()
+        messages.success(request, "Favorilere eklendi.")
 
-    return render(request, "add_favourite.html", {"form": form})
+    return render(request, "add_favourite.html")
+
+
+@login_required(login_url='user:login')
+def delete_favourite(request, id):
+    print(id)
+    pass
 
 
 @login_required(login_url="user:login")
@@ -51,6 +65,7 @@ def wish(request):
     books = Book.objects.all()
     context = {"books": books}
     return render(request, "wish.html", context=context)
+
 
 @login_required(login_url="user:login")
 def add_wish(request, id):
@@ -61,8 +76,11 @@ def add_wish(request, id):
         messages.success(request, "İstek Kitaplığına Eklendi")
 
     return render(request, "add_wish.html", {"form": form})
+
+
 @login_required(login_url="user:login")
 def add_book(request):
+    print(request.POST)
     form = BookForm(request.POST or None, request.FILES or None)
 
     if form.is_valid():
@@ -112,12 +130,10 @@ def comment(request, id):
         comment_author = request.POST.get("comment_author")
         comment_content = request.POST.get("comment_content")
 
-        newComment = Comment(comment_author=comment_author, comment_content=comment_content)
+        newComment = Comment(comment_author=comment_author,
+                             comment_content=comment_content)
 
         newComment.book = book
 
         newComment.save()
     return redirect(reverse("book:detail", kwargs={"id": id}))
-
-
-
