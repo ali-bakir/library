@@ -2,12 +2,12 @@
 
 {% block body %}
 
-       <h3>Favori Listesi</h3>
+    <h3>Favori Listesi</h3>
     <hr>
     <p>
         Hoşgeldiniz, <small>{{ request.user.username }}</small>
     </p>
-    {% if books %}
+    {% if  favourite_books %}
         <table class="table">
             <thead>
             <tr>
@@ -20,14 +20,23 @@
             </thead>
             <tbody>
 
-            {% for book in books %}
+            {% for fav in favourite_books %}
                 <tr>
-                    <th scope="row">{{ book.id }}</th>
-                    <td><a href="{% url 'book:detail' book.id %}">{{ book.title }}</a></td>
-                    <td>{{ book.author.name }}</td>
-                    <td>{{ book.created_date }}</td>
-                    <td><a href="{% url 'book:delete' book.id %}" class="btn btn-danger">Sil</a></td>
-
+                    <th scope="row">{{ fav.id }}</th>
+                    <td>
+                        <a href="{% url 'book:detail' fav.id %}">{{ fav.book.title }}</a>
+                    </td>
+                    <td>{{ fav.book.author.name }}</td>
+                    <td>{{ fav.book.created_date }}</td>
+                    <td>
+                        {% comment %}<a href="{% url 'book:delete' fav.book.id %}"
+                           class="btn btn-danger">Sil</a>{% endcomment %}
+                        <form action="book/delete_favourite/" method="delete">
+                            <input type="text" hidden="true"
+                                   value="{{ fav.id }}">
+                            <input type="submit" value="Delete">
+                        </form>
+                    </td>
                 </tr>
             {% endfor %}
 
