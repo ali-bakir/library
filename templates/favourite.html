@@ -31,9 +31,8 @@
                     <td>
                         {% comment %}<a href="{% url 'book:delete' fav.book.id %}"
                            class="btn btn-danger">Sil</a>{% endcomment %}
-                        <form action="book/delete_favourite/" method="delete">
-                            <input type="text" hidden="true"
-                                   value="{{ fav.id }}">
+                        <form action="{% url 'book:delete_favourite' fav.id %}"
+                              method="delete">
                             <input type="submit" value="Delete">
                         </form>
                     </td>
