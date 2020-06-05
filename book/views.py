@@ -39,7 +39,7 @@ def favourite(request):
         'book__author',
         'user').filter(
         user=request.user)
-    print(favourite_books.query)
+
     context = {"favourite_books": favourite_books}
     return render(request, "favourite.html", context=context)
 
@@ -51,13 +51,16 @@ def add_favourite(request, id):
         form.save()
         messages.success(request, "Favorilere eklendi.")
 
-    return render(request, "add_favourite.html")
+    return redirect(reverse("book:favourite"))
 
 
 @login_required(login_url='user:login')
 def delete_favourite(request, id):
-    print(id)
-    pass
+    FavouriteBook.objects.filter(id=id).delete()
+
+    messages.success(request, "Kaldırıldı.")
+
+    return redirect(reverse("book:favourite"))
 
 
 @login_required(login_url="user:login")
