@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-
+{% load crispy_forms_tags %}
 {% block body %}
     <h3>Kontrol Paneli</h3>
     <hr>
@@ -7,14 +7,18 @@
         Hoşgeldiniz, <small>{{ request.user.username }}</small>
     </p>
     <hr>
-    <a class="btn btn-danger" href="{% url 'book:add_book' %}">Kitap Ekle </a>
+    {#    <a class="btn btn-danger" href="{% url 'book:books' %}">Kitap Ekle </a>#}
+    <form method="post" action="{% url 'book:books' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Kitap Ekle</button>
+    </form>
     <hr>
     {% if books %}
         <table class="table">
             <thead>
             <tr>
                 <th scope="col">id</th>
-                <th scope="col">Başlık</th>
+                <th scope="col">Kitap Adı</th>
                 <th scope="col">Yazar</th>
                 <th scope="col">Tarih</th>
                 <th scope="col">Güncelle</th>
@@ -27,12 +31,17 @@
             {% for book in books %}
                 <tr>
                     <th scope="row">{{ book.id }}</th>
-                    <td><a href="{% url 'book:detail' book.id %}">{{ book.title }}</a></td>
+                    <td>
+                        <a href="{% url 'book:detail' book.id %}">{{ book.title }}</a>
+                    </td>
                     <td>{{ book.author.name }}</td>
                     <td>{{ book.created_date }}</td>
-                    <td><a href="{% url 'book:update' book.id %}" class="btn btn-danger">Güncelle</a></td>
-                    <td><a href="{% url 'book:delete' book.id %}" class="btn btn-danger">Sil</a></td>
-                    <td><a href="{% url 'book:add_favourite' book.id %}" class="btn btn-danger">Favorine Ekle</a></td>
+                    <td><a href="{% url 'book:update' book.id %}"
+                           class="btn btn-danger">Güncelle</a></td>
+                    <td><a href="{% url 'book:delete' book.id %}"
+                           class="btn btn-danger">Sil</a></td>
+                    <td><a href="{% url 'book:add_favourite' book.id %}"
+                           class="btn btn-danger">Favorine Ekle</a></td>
 
                 </tr>
             {% endfor %}
