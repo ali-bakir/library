@@ -1,5 +1,5 @@
 from django import forms
-from .models import Book, FavouriteBook
+from .models import Book, FavouriteBook, WishBook, WishAuthor, WishPublisher
 
 
 class BookForm(forms.ModelForm):
@@ -8,10 +8,31 @@ class BookForm(forms.ModelForm):
         fields = ['title', 'author', 'publisher', 'content', "book_image"]
 
 
-form = BookForm()
-
-
 class FavouriteBookForm(forms.ModelForm):
     class Meta:
         model = FavouriteBook
         fields = ['user', 'book']
+
+
+class WishAuthorForm(forms.ModelForm):
+    class Meta:
+        model = WishAuthor
+        fields = "__all__"
+
+
+class WishPublisherForm(forms.ModelForm):
+    class Meta:
+        model = WishPublisher
+        fields = "__all__"
+
+
+class WishBookForm(forms.ModelForm):
+
+    class Meta:
+        model = WishBook
+        fields = ['title', 'author', 'publisher']
+
+    def __init__(self, *args, **kwargs):
+        super(WishBookForm, self).__init__(*args, **kwargs)
+        self.fields['author'].widget = forms.TextInput()
+        self.fields['publisher'].widget = forms.TextInput()
