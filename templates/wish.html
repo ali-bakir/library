@@ -7,9 +7,9 @@
         Hoşgeldiniz, <small>{{ request.user.username }}</small>
     </p>
     <hr>
-    <a class="btn btn-danger" href="{% url 'book:wish' %}">İstek Kitap Ekle </a>
+    <a class="btn btn-danger" href="{% url 'book:add_wish' %}">İstek Kitap Ekle </a>
     <hr>
-    {% if books %}
+    {% if wish %}
         <table class="table">
             <thead>
             <tr>
@@ -22,13 +22,13 @@
             </thead>
             <tbody>
 
-            {% for book in books %}
+            {% for wis in wish_books %}
                 <tr>
-                    <th scope="row">{{ book.id }}</th>
-                    <td><a href="{% url 'book:detail' book.id %}">{{ book.title }}</a></td>
-                    <td>{{ book.author.name }}</td>
-                    <td>{{ book.created_date }}</td>
-                    <td><a href="{% url 'book:delete' book.id %}" class="btn btn-danger">Sil</a></td>
+                    <th scope="row">{{ wis.id }}</th>
+                    <td><a href="{% url 'book:detail' wis.id %}">{{ wis.title }}</a></td>
+                    <td>{{ wis.author.name }}</td>
+                    <td>{{ wis.created_date }}</td>
+                    <td><a href="{% url 'book:delete_wish' book.id %}" class="btn btn-danger">Sil</a></td>
 
                 </tr>
             {% endfor %}
@@ -38,7 +38,7 @@
     {% else %}
 
         <div class="alert alert-danger">
-            Henüz Bir Favori Kitap Eklenmedi.
+            Henüz Bir İstek Kitap Eklenmedi.
 
         </div>
     {% endif %}
