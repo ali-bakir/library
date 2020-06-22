@@ -13,6 +13,10 @@ class Author(models.Model):
         return "{} {}".format(self.name, self.last_name)
 
 
+class WishAuthor(Author):
+    pass
+
+
 class Publisher(models.Model):
     name = models.CharField(max_length=50, verbose_name="Adı")
 
@@ -20,20 +24,28 @@ class Publisher(models.Model):
         return self.name
 
 
-class Book(models.Model):
-    author = models.ForeignKey(Author, on_delete=models.CASCADE,
-                               verbose_name="Yazar")
-    title = models.CharField(max_length=50, verbose_name="Başlık")
-    content = RichTextField(verbose_name="İçerik")
+class WishPublisher(Publisher):
+    pass
+
+
+class BaseBook(models.Model):
+    title = models.CharField(max_length=50, verbose_name="Kitap Adı", default='')
+
     created_date = models.DateTimeField(auto_now_add=True,
                                         verbose_name="Oluşturulma Tarihi")
-    publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE,
-                                  default=None)
-    book_image = models.FileField(blank=True, null=True,
-                                  verbose_name="Kitaba Fotoğraf Ekleyebilirsiniz.")
 
     def __str__(self):
         return self.title
+
+
+class Book(BaseBook):
+    author = models.ForeignKey(Author, on_delete=models.CASCADE,
+                               verbose_name="Yazar")
+    content = RichTextField(verbose_name="İçerik")
+    book_image = models.FileField(blank=True, null=True,
+                                  verbose_name="Kitaba Fotoğraf Ekleyebilirsiniz.")
+    publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE,
+                                  default=None)
 
 
 class Comment(models.Model):
@@ -54,3 +66,10 @@ class FavouriteBook(models.Model):
     book = models.ForeignKey(Book, on_delete=models.PROTECT,
                              verbose_name="Kitap")
     user = models.ForeignKey(User, on_delete=models.PROTECT)
+
+
+class WishBook(BaseBook):
+    author = models.ForeignKey(WishAuthor, on_delete=models.CASCADE,
+                               verbose_name="Yazar", default=None)
+    publisher = models.ForeignKey(WishPublisher, on_delete=models.CASCADE,
+                                  default=None)
