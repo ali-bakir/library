@@ -22,7 +22,7 @@
 
             {% for fav in favourite_books %}
                 <tr>
-                    <th scope="row">{{ fav.id }}</th>
+                    <th scope="row">{{ fav.pk }}</th>
                     <td>
                         <a href="{% url 'book:detail' fav.id %}">{{ fav.book.title }}</a>
                     </td>
@@ -31,9 +31,11 @@
                     <td>
                         {% comment %}<a href="{% url 'book:delete' fav.book.id %}"
                            class="btn btn-danger">Sil</a>{% endcomment %}
-                        <form action="{% url 'book:delete_favourite' fav.id %}"
+                        <form action="{% url 'book:favourite' %}"
                               method="delete">
-                            <input type="submit" value="Delete">
+{#                            {%  csrf_token %}#}
+                            <input type="text" name="fav_id" value={{ fav.id }}>
+                            <input type="submit" value="Sil">
                         </form>
                     </td>
                 </tr>
@@ -47,5 +49,6 @@
             Henüz Bir Favori Kitap Eklenmedi.
 
         </div>
+
     {% endif %}
 {% endblock body %}
