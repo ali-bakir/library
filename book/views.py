@@ -13,7 +13,6 @@ class BookView(View):
     form_class = BookForm
     template_name = "books.html"
     queryset = Book.objects.all()
-    success_url = ''
 
     def get_queryset(self, request):
         # self.queryset = self.queryset.filter(user=request.user)
@@ -39,7 +38,8 @@ class BookView(View):
                       {"form": form})
 
     def delete(self, request, *args, **kwargs):
-        book = get_object_or_404(Book, pk=id)
+        queryset = Book.objects.all()
+        book = get_object_or_404(Book, pk=pk)
 
         book.delete()
 
@@ -73,17 +73,21 @@ class AboutView(View):
         return render(request, self.template_name)
 
 
-@login_required(login_url="user:login")
-def dashboard(request):
-    books = Book.objects.all()
-    context = {"books": books}
-    return render(request, "dashboard.html", context=context)
+class DashboardView(View):
+    template_name = "dashboard.html"
+
+    def get(self, request, *args, **kwargs):
+        books = Book.objects.all()
+        context = {"books": books}
+        return render(request, self.template_name, context=context)
 
 
 class FavouriteBookView(View):
     form_class = FavouriteBookForm
     template_name = "favourite.html"
     queryset = FavouriteBook.objects.select_related()
+    success_url = '/book'
+    initial = {'key': 'value'}
 
     def get(self, request, *args, **kwargs):
         favourite_books = FavouriteBook.objects.select_related(
@@ -96,53 +100,56 @@ class FavouriteBookView(View):
         return render(request, self.template_name, context=context)
 
     def post(self, request, *args, **kwargs):
-        form = self.form_class({'user': request.user.pk, 'book': pk})
+        print('22222')
+        data = request.POST
+        book_id = data.get('book_id', None)
+        form = self.form_class({'user': request.user.pk, 'book': book_id})
         if form.is_valid():
+            # TODO: check already existence for favourite book
             form.save()
             messages.success(request, "Favorilerine Eklendi.")
 
         return redirect(reverse("book:favourite"))
 
     def delete(self, request, *args, **kwargs):
-        FavouriteBook.objects.filter(id=id).delete()
+        data = request.POST
+        print(data)
+        fav_id = data.get('fav_id', None)
+        FavouriteBook.objects.filter(id=fav_id).delete()
 
         messages.success(request, "Kaldırıldı.")
 
         return redirect(reverse("book:favourite"))
 
 
+class WishBookView(View):
+    form_class = WishBookForm
+    template_name = 'wish.html'
 
-@login_required(login_url="user:login")
-def wish(request):
-    books = WishBook.objects.all()
+    def get(self, request, *args, **kwargs):
+        books = WishBook.objects.all()
 
-    return render(request, "wish.html", {"wish": books})
+        return render(request, self.template_name, {"wish": books})
 
+    def post(self, request, *args, **kwargs):
+        form = WishBookForm(request.POST)
+        form2 = WishAuthorForm(request.POST)
+        form3 = WishPublisherForm(request.POST)
+        if form.is_valid() and form2.is_valid() and form3.is_valid():
+            form3.save()
+            form2.save()
+            form.save()
+            messages.success(request, "İstek Alındı.")
 
-login_required(login_url="user:login")
+        return render(request, self.template_name,
+                      {"form": form, "form2": form2, "form3": form3})
 
+    def delete(self, request, *args, **kwargs):
+        WishBook.objects.filter(pk=pk).delete()
 
-def add_wish(request):
-    form = WishBookForm(request.POST)
-    form2 = WishAuthorForm(request.POST)
-    form3 = WishPublisherForm(request.POST)
-    if form.is_valid() and form2.is_valid() and form3.is_valid():
-        form3.save()
-        form2.save()
-        form.save()
-        messages.success(request, "İstek Alındı.")
+        messages.success(request, "İstek Kitap Kaldırıldı.")
 
-    return render(request, "add_wish.html",
-                  {"form": form, "form2": form2, "form3": form3})
-
-
-@login_required(login_url='user:login')
-def delete_wish(request, id):
-    WishBook.objects.filter(id=id).delete()
-
-    messages.success(request, "İstek Kitap Kaldırıldı.")
-
-    return redirect(reverse("book:wish"))
+        return redirect(reverse("book:wish"))
 
 
 def detail(request, id):
@@ -151,16 +158,6 @@ def detail(request, id):
 
     comments = book.comments.all()
     return render(request, "detail.html", {"book": book, "comments": comments})
-
-
-@login_required(login_url="user:login")
-def delete_book(request, id):
-    book = get_object_or_404(Book, id=id)
-
-    book.delete()
-
-    messages.success(request, "Kitap Başarıyla Silindi")
-    return redirect("book:dashboard")
 
 
 def comment(request, id):
