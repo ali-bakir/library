@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect, get_object_or_404, \
     reverse
 from .forms import BookForm, FavouriteBookForm, WishBookForm, WishAuthorForm, \
-    WishPublisherForm
+    WishPublisherForm, CommentForm
 from .models import Book, Comment, FavouriteBook, WishBook
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -13,6 +13,14 @@ class BookView(View):
     form_class = BookForm
     template_name = "books.html"
     queryset = Book.objects.all()
+
+    def dispatch(self, request, *args, **kwargs):
+        method = self.request.POST.get('_method', '').lower()
+        if method == 'put':
+            return self.put(request, *args, **kwargs)
+        if method == 'delete':
+            return self.delete(request, *args, **kwargs)
+        return super(BookView, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self, request):
         # self.queryset = self.queryset.filter(user=request.user)
@@ -89,6 +97,14 @@ class FavouriteBookView(View):
     success_url = '/book'
     initial = {'key': 'value'}
 
+    def dispatch(self, request, *args, **kwargs):
+        method = self.request.POST.get('_method', '').lower()
+        if method == 'put':
+            return self.put(request, *args, **kwargs)
+        if method == 'delete':
+            return self.delete(request, *args, **kwargs)
+        return super(FavouriteBookView, self).dispatch(request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         favourite_books = FavouriteBook.objects.select_related(
             'book',
@@ -100,7 +116,6 @@ class FavouriteBookView(View):
         return render(request, self.template_name, context=context)
 
     def post(self, request, *args, **kwargs):
-        print('22222')
         data = request.POST
         book_id = data.get('book_id', None)
         form = self.form_class({'user': request.user.pk, 'book': book_id})
@@ -113,7 +128,7 @@ class FavouriteBookView(View):
 
     def delete(self, request, *args, **kwargs):
         data = request.POST
-        print(data)
+        print('33333')
         fav_id = data.get('fav_id', None)
         FavouriteBook.objects.filter(id=fav_id).delete()
 
@@ -126,51 +141,77 @@ class WishBookView(View):
     form_class = WishBookForm
     template_name = 'wish.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        method = self.request.POST.get('_method', '').lower()
+        if method == 'put':
+            return self.put(request, *args, **kwargs)
+        if method == 'delete':
+            return self.delete(request, *args, **kwargs)
+        return super(WishBookView, self).dispatch(request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         books = WishBook.objects.all()
 
         return render(request, self.template_name, {"wish": books})
 
     def post(self, request, *args, **kwargs):
-        form = WishBookForm(request.POST)
-        form2 = WishAuthorForm(request.POST)
-        form3 = WishPublisherForm(request.POST)
-        if form.is_valid() and form2.is_valid() and form3.is_valid():
-            form3.save()
-            form2.save()
-            form.save()
+        wish_book_form = WishBookForm(request.POST)
+        wish_author_form = WishAuthorForm(request.POST)
+        wish_publisher_form = WishPublisherForm(request.POST)
+        if wish_book_form.is_valid() and wish_author_form.is_valid() and wish_publisher_form.is_valid():
+            wish_publisher_form.save()
+            wish_author_form.save()
+            wish_book_form.save()
             messages.success(request, "İstek Alındı.")
 
         return render(request, self.template_name,
-                      {"form": form, "form2": form2, "form3": form3})
+                      {"wish_book_form": wish_book_form,
+                       "wish_author_form": wish_author_form,
+                       "wish_publisher_form": wish_publisher_form})
 
     def delete(self, request, *args, **kwargs):
-        WishBook.objects.filter(pk=pk).delete()
+        # request.??
 
-        messages.success(request, "İstek Kitap Kaldırıldı.")
+        # WishBook.objects.filter(id=id).delete()
+
+        # messages.success(request, "İstek Kitap Kaldırıldı.")
 
         return redirect(reverse("book:wish"))
 
 
-def detail(request, id):
-    book = Book.objects.filter(id=id).first()
-    book = get_object_or_404(Book, id=id)
+class DetailView(View):
+    template_name = 'detail.html'
 
-    comments = book.comments.all()
-    return render(request, "detail.html", {"book": book, "comments": comments})
+    def get(self, request, *args, **kwargs):
+        book_id = kwargs.get('pk')
+        book = get_object_or_404(Book, id=book_id)
+        comments = book.comments.all()
+        return render(request, self.template_name,
+                      {"book": book, "comments": comments})
+
+    # def post(self, request, *args, **kwargs):
+    # book = Book.objects.filter(id=id).first()
+    # book = get_object_or_404(Book, id=id)
+    # comments = book.comments.all()
+    # return render(request, self.template_name,
+    # {"book": book, "comments": comments})
 
 
-def comment(request, id):
-    book = get_object_or_404(Book, id=id)
+class CommentView(View):
+    form_class = CommentForm
 
-    if request.method == "POST":
-        comment_author = request.POST.get("comment_author")
-        comment_content = request.POST.get("comment_content")
+    def post(self, request, *args, **kwargs):
+        data = request.POST
+        book_id = data.get('book', None)
+        book = get_object_or_404(Book, id=book_id)
+        is_book_exist = Book.objects.filter(id=book_id).exists()
+        form = self.form_class(data)
 
-        newComment = Comment(comment_author=comment_author,
-                             comment_content=comment_content)
+        if form.is_valid() and is_book_exist:
+            data = dict(data)
+            data.pop('book', None)
+            data.pop('csrfmiddlewaretoken', None)
+            Comment.objects.create(book_id=book_id, **data)
+            messages.success(request, "Yorum Yayınlandı.")
 
-        newComment.book = book
-
-        newComment.save()
-    return redirect(reverse("book:detail", kwargs={"id": id}))
+        return redirect(reverse("book:detail", kwargs={"pk": book_id}))
