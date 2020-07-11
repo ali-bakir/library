@@ -68,18 +68,20 @@
 
     {% if form %}
         <div class="row">
-        <div class="col-md-6 offset-md-3">
-            <h3>Kitap Oluştur</h3>
-            <hr>
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ form.media }}
-                {{ form|crispy }}
-                <br>
-                <button type="submit" class="btn btn-danger">Kitap Ekle
-                </button>
-            </form>
-            <div class="row"
+            <div class="col-md-6 offset-md-3">
+                <h3>Kitap Oluştur</h3>
+                <hr>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.media }}
+                    {{ form|crispy }}
+                    <br>
+                    <button type="submit" class="btn btn-danger">Kitap Ekle
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-md-6 offset-md-3">
                 <h3>Kitap Güncelle</h3>
                 <hr>
@@ -91,7 +93,7 @@
                     <button type="submit" class="btn btn-danger">Kitap
                         Güncelle
                     </button>
-
+                </form>
             </div>
         </div>
     {% endif %}
