@@ -32,9 +32,8 @@
                         {% comment %}<a href="{% url 'book:delete' fav.book.id %}"
                            class="btn btn-danger">Sil</a>{% endcomment %}
                         <form action="{% url 'book:favourite' %}"
-                              method="post">
-                            {%  csrf_token %}
-                            <input type="hidden" name="_method" value="DELETE">
+                              method="delete">
+{#                            {%  csrf_token %}#}
                             <input type="text" name="fav_id" value={{ fav.id }}>
                             <input type="submit" value="Sil">
                         </form>
