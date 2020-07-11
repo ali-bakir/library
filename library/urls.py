@@ -18,7 +18,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-from book.views import IndexView, BookView, AboutView
+from book.views import IndexView, BookView, AboutView, DetailView, CommentView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
